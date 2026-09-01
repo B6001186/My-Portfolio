@@ -1,0 +1,315 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+@import "tailwindcss";
+
+:root {
+  font-family: "Press Start 2P", monospace;
+  color: #171717;
+  background: #fff7d6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-family: "Press Start 2P", monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #fff7d6;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.pixel-font {
+  font-family: "Press Start 2P", monospace;
+}
+
+/* Pixel-art image rendering */
+.pixel-avatar {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Main pixel card */
+.pixel-box {
+  border: 4px solid #000;
+  border-radius: 0;
+  box-shadow: 8px 8px 0 #000;
+}
+
+/* Pixel button */
+.pixel-button {
+  border: 4px solid #000;
+  border-radius: 0;
+  color: #000;
+  box-shadow: 6px 6px 0 #000;
+  transition:
+    transform 100ms steps(1),
+    box-shadow 100ms steps(1);
+}
+
+.pixel-button:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+.pixel-button:active {
+  transform: translate(6px, 6px);
+  box-shadow: none;
+}
+
+/* Small mobile-menu button */
+.pixel-small-button {
+  border: 3px solid #000;
+  border-radius: 0;
+  color: #000;
+  box-shadow: 3px 3px 0 #000;
+  transition:
+    transform 100ms steps(1),
+    box-shadow 100ms steps(1);
+}
+
+.pixel-small-button:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.pixel-small-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* Keyboard focus */
+.pixel-button:focus-visible,
+.pixel-nav-link:focus-visible,
+.pixel-small-button:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 4px solid #2563eb;
+  outline-offset: 4px;
+}
+
+/* Navigation links */
+.pixel-nav-link {
+  border: 3px solid #000;
+  background: #fff;
+  padding: 10px 12px;
+  color: #000;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  box-shadow: 3px 3px 0 #000;
+  transition:
+    transform 100ms steps(1),
+    box-shadow 100ms steps(1),
+    background-color 100ms steps(1);
+}
+
+.pixel-nav-link:hover {
+  transform: translate(2px, 2px);
+  background: #facc15;
+  box-shadow: 1px 1px 0 #000;
+}
+
+.pixel-nav-link:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* Small pixel label */
+.pixel-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 4px solid #000;
+  padding: 12px 14px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  box-shadow: 5px 5px 0 #000;
+}
+
+/* Pixel text shadows */
+.pixel-text-shadow {
+  text-shadow: 3px 3px 0 #000;
+}
+
+.pixel-text-shadow-dark {
+  text-shadow: 4px 4px 0 #000;
+}
+
+/* Grid background */
+.pixel-grid {
+  background-color: #fff7d6;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.08) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 2px, transparent 2px);
+  background-size: 32px 32px;
+}
+
+/* Dot background */
+.pixel-dot-pattern {
+  background-image: radial-gradient(#000 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+/* Project preview background */
+.pixel-project-bg {
+  background-color: #22d3ee;
+  background-image:
+    linear-gradient(45deg, #facc15 25%, transparent 25%),
+    linear-gradient(-45deg, #facc15 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #facc15 75%),
+    linear-gradient(-45deg, transparent 75%, #facc15 75%);
+  background-position:
+    0 0,
+    0 16px,
+    16px -16px,
+    -16px 0;
+  background-size: 32px 32px;
+}
+
+/* Blinking game status */
+.animate-blink {
+  animation: pixel-blink 900ms steps(1, end) infinite;
+}
+
+/* Short pixel bounce */
+.animate-bounce-short {
+  animation: pixel-bounce 700ms steps(2, end) infinite;
+}
+
+@keyframes pixel-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pixel-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Selected text */
+::selection {
+  color: #000;
+  background: #facc15;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  body {
+    font-size: 11px;
+  }
+
+  p {
+    line-height: 2;
+  }
+
+  .pixel-box {
+    box-shadow: 6px 6px 0 #000;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  body {
+    font-size: 10px;
+  }
+
+  p {
+    line-height: 2.2;
+  }
+
+  .pixel-label {
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 7px;
+  }
+
+  .pixel-nav-link {
+    font-size: 7px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 420px) {
+  .pixel-box {
+    box-shadow: 5px 5px 0 #000;
+  }
+
+  .pixel-button {
+    box-shadow: 4px 4px 0 #000;
+  }
+
+  .pixel-label {
+    font-size: 6px;
+    line-height: 2;
+  }
+
+  .pixel-text-shadow-dark {
+    text-shadow: 3px 3px 0 #000;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
