@@ -1,743 +1,184 @@
-import { useEffect, useState } from "react";
-import {
-  ArrowRight,
-  Code2,
-  Contrast,
-  Database,
-  Download,
-  ExternalLink,
-  Eye,
-  Mail,
-  Menu,
-  Monitor,
-  Phone,
-  Server,
-  Sparkles,
-  Wrench,
-  X,
-} from "lucide-react";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
-import { SiFigma } from "react-icons/si";
+import { useEffect, useRef, useState } from "react";
+import { ArrowDown, ArrowUpRight, Check, Code2, Copy, Database, Download, Eye, GitBranch, Mail, Menu, Moon, Phone, Server, Sun, X } from "lucide-react";
+import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
 import avatar from "./assets/avatar.png";
 
 const CV_URL = "/Atcharaporn-Okrathok-CV.pdf";
-
-const navigation = [
-  { label: "HOME", href: "#home" },
-  { label: "ABOUT", href: "#about" },
-  { label: "SKILLS", href: "#skills" },
-  { label: "PROJECTS", href: "#projects" },
-  { label: "CONTACT", href: "#contact" },
-];
-
+const EMAIL = "atcharapornok@gmail.com";
+const GITHUB = "https://github.com/B6001186";
+const LINKEDIN = "https://www.linkedin.com/in/atcharaporn-okrathok-40a2a0189/";
+const navigation = ["About", "Projects", "Skills", "Contact"];
 const skillGroups = [
-  {
-    title: "FRONTEND",
-    icon: Monitor,
-    color: "bg-[var(--cyan)]",
-    skills: [
-      "HTML",
-      "CSS",
-      "JavaScript",
-      "React.js",
-      "Next.js",
-      "Tailwind CSS",
-    ],
-  },
-  {
-    title: "BACKEND",
-    icon: Server,
-    color: "bg-[var(--purple)]",
-    skills: ["Node.js", "Express.js", "REST API", "Authentication"],
-  },
-  {
-    title: "DATABASE",
-    icon: Database,
-    color: "bg-[var(--green)]",
-    skills: ["PostgreSQL", "MongoDB", "Database Design"],
-  },
-  {
-    title: "TOOLS",
-    icon: Wrench,
-    color: "bg-[var(--yellow)]",
-    skills: ["Git", "GitHub", "Figma", "Postman", "Agile/Scrum"],
-  },
-];
-
-const projects = [
-  {
-    title: "PROJECT GV",
-    type: "FULL-STACK WEB APPLICATION",
-    description:
-      "A team-based web application focused on intuitive interface design, effective data management, and collaborative development using Agile and Scrum.",
-    technologies: ["React", "Node.js", "Tailwind CSS", "Database"],
-    repository: "https://github.com/nookarin/team-07-ProjectGV-Sprint2",
-  },
+  { title: "Frontend", icon: Code2, skills: ["HTML", "CSS", "JavaScript", "React.js", "Next.js", "Tailwind CSS"] },
+  { title: "Backend", icon: Server, skills: ["Node.js", "Express.js", "REST APIs", "Authentication"] },
+  { title: "Databases", icon: Database, skills: ["PostgreSQL", "MongoDB", "Supabase", "Database Design"] },
+  { title: "Tools & workflow", icon: GitBranch, skills: ["Git", "GitHub", "Figma", "Postman", "Agile / Scrum"] },
 ];
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const [retroMode, setRetroMode] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    return window.localStorage.getItem("portfolio-theme") === "retro";
+  const [activeSection, setActiveSection] = useState("home");
+  const [copyState, setCopyState] = useState("idle");
+  const copyTimer = useRef(null);
+  const [darkMode, setDarkMode] = useState(() => {
+    try { return localStorage.getItem("portfolio-theme") === "dark"; }
+    catch { return false; }
   });
 
   useEffect(() => {
-    window.localStorage.setItem(
-      "portfolio-theme",
-      retroMode ? "retro" : "color",
-    );
-  }, [retroMode]);
+    document.documentElement.dataset.theme = darkMode ? "dark" : "light";
+    try { localStorage.setItem("portfolio-theme", darkMode ? "dark" : "light"); }
+    catch { /* Keep the theme usable when browser storage is unavailable. */ }
+  }, [darkMode]);
 
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActiveSection(entry.target.id);
+      });
+    }, { rootMargin: "-15% 0px -55% 0px", threshold: 0 });
+    document.querySelectorAll("main > section[id]").forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
-  const toggleTheme = () => {
-    setRetroMode((current) => !current);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        document.getElementById("menu-toggle")?.focus();
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
+
+  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+
+  async function copyEmail() {
+    window.clearTimeout(copyTimer.current);
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopyState("copied");
+    } catch { setCopyState("error"); }
+    copyTimer.current = window.setTimeout(() => setCopyState("idle"), 3500);
+  }
 
   return (
-    <div
-      className={`theme-root min-h-screen overflow-x-hidden bg-[var(--page)] text-[var(--text)] ${
-        retroMode ? "theme-retro" : "theme-color"
-      }`}
-    >
-      <header className="fixed inset-x-0 top-0 z-50 border-b-4 border-black bg-[var(--pink)]">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
-          <a
-            href="#home"
-            onClick={closeMenu}
-            className="brand-name min-w-0 truncate text-[10px] leading-6 text-[var(--brand-text)] sm:text-xs"
-          >
-            ATCHARAPORN OKRATHOK
-            <span className="animate-blink">_</span>
-          </a>
-
-          <div className="flex shrink-0 items-center gap-3">
-            <div className="hidden items-center gap-3 md:flex">
-              {navigation.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="pixel-nav-link"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
-
-            <ThemeButton
-              retroMode={retroMode}
-              onClick={toggleTheme}
-              desktop
-            />
-
-            <button
-              type="button"
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-              aria-controls="mobile-navigation"
-              onClick={() => setMenuOpen((current) => !current)}
-              className="pixel-small-button grid h-11 w-11 place-items-center bg-[var(--yellow)] md:hidden"
-            >
-              {menuOpen ? (
-                <X size={22} strokeWidth={4} aria-hidden="true" />
-              ) : (
-                <Menu size={22} strokeWidth={4} aria-hidden="true" />
-              )}
+    <div className="site-shell">
+      <a className="skip-link" href="#main">Skip to content</a>
+      <header className="site-header">
+        <nav className="container navigation" aria-label="Main navigation">
+          <a href="#home" className="wordmark" aria-label="Faii, home" onClick={() => setMenuOpen(false)}>faii<span>.</span></a>
+          <div className="desktop-links">
+            {navigation.map((label) => <a key={label} href={`#${label.toLowerCase()}`} aria-current={activeSection === label.toLowerCase() ? "location" : undefined}>{label}</a>)}
+          </div>
+          <div className="nav-actions">
+            <button className="icon-button theme-toggle" onClick={() => setDarkMode(!darkMode)} aria-label={`Switch to ${darkMode ? "light" : "dark"} theme`} aria-pressed={darkMode}>
+              {darkMode ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
+            <a href="#contact" className="nav-contact">Let’s talk <ArrowUpRight size={16} /></a>
+            <button id="menu-toggle" className="icon-button menu-toggle" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </nav>
-
-        {menuOpen && (
-          <div
-            id="mobile-navigation"
-            className="border-t-4 border-black bg-[var(--purple)] p-4 md:hidden"
-          >
-            <div className="mx-auto flex max-w-7xl flex-col gap-3">
-              {navigation.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  onClick={closeMenu}
-                  className="pixel-button bg-[var(--surface)] px-4 py-4 text-center text-[8px] leading-5"
-                >
-                  {item.label}
-                </a>
-              ))}
-
-              <ThemeButton
-                retroMode={retroMode}
-                onClick={toggleTheme}
-              />
-            </div>
-          </div>
-        )}
+        {menuOpen && <nav id="mobile-navigation" className="mobile-links" aria-label="Mobile navigation">
+          {navigation.map((label) => <a key={label} href={`#${label.toLowerCase()}`} onClick={() => setMenuOpen(false)}>{label}<ArrowUpRight size={16} /></a>)}
+        </nav>}
       </header>
 
-      <main>
-        <section
-          id="home"
-          className="animated-section pixel-grid relative min-h-screen scroll-mt-24 overflow-hidden border-b-4 border-black bg-[var(--page)] px-5 pb-20 pt-32 lg:px-8"
-        >
-          <PixelDecoration className="left-[5%] top-32 bg-[var(--cyan)]" />
-          <PixelDecoration className="right-[7%] top-48 bg-[var(--yellow)]" />
-          <PixelDecoration className="bottom-20 left-[45%] bg-[var(--green)]" />
-
-          <div className="relative mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
-            <div>
-              <div className="pixel-label bg-[var(--purple)] text-[var(--label-text)]">
-                <Sparkles size={16} strokeWidth={4} aria-hidden="true" />
-                PLAYER 01: FULL-STACK DEVELOPER
-              </div>
-
-              <h1 className="mt-8 text-2xl leading-[1.8] sm:text-3xl sm:leading-[1.8] lg:text-4xl lg:leading-[1.8]">
-                HI, I&apos;M
-                <span className="pixel-text-shadow-dark mt-3 block break-words text-[var(--hot-pink)]">
-                  Faii
-                </span>
-              </h1>
-
-              <div className="pixel-box mt-8 max-w-2xl bg-[var(--surface)] p-5 sm:p-7">
-                <p className="text-[10px] leading-7 sm:text-xs sm:leading-8">
-                  I am a full-stack developer passionate about building
-                  beautiful, accessible, and user-friendly web applications,
-                  from thoughtful interface design to reliable system
-                  development.
-                </p>
-              </div>
-
-              <div className="mt-10 flex flex-wrap gap-5">
-                <a
-                  href="#projects"
-                  className="pixel-button inline-flex items-center gap-3 bg-[var(--yellow)] px-5 py-4 text-[8px] leading-5 sm:text-[9px]"
-                >
-                  VIEW PROJECTS
-                  <ArrowRight size={17} strokeWidth={4} aria-hidden="true" />
-                </a>
-
-                <a
-                  href="#contact"
-                  className="pixel-button inline-flex items-center gap-3 bg-[var(--cyan)] px-5 py-4 text-[8px] leading-5 sm:text-[9px]"
-                >
-                  CONTACT ME
-                  <Mail size={17} strokeWidth={4} aria-hidden="true" />
-                </a>
-
-                <a
-                  href={CV_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="pixel-button inline-flex items-center gap-3 bg-[var(--surface)] px-5 py-4 text-[8px] leading-5 sm:text-[9px]"
-                >
-                  PREVIEW CV
-                  <Eye size={17} strokeWidth={4} aria-hidden="true" />
-                </a>
-
-                <a
-                  href={CV_URL}
-                  download="Atcharaporn-Okrathok-CV.pdf"
-                  className="pixel-button inline-flex items-center gap-3 bg-[var(--green)] px-5 py-4 text-[8px] leading-5 sm:text-[9px]"
-                >
-                  DOWNLOAD CV
-                  <Download size={17} strokeWidth={4} aria-hidden="true" />
-                </a>
-              </div>
-
-              <div className="mt-10 flex flex-wrap gap-5">
-                <PixelIconLink
-                  href="https://github.com/B6001186"
-                  icon={FaGithub}
-                  label="GitHub"
-                  color="bg-[var(--surface)]"
-                />
-
-                <PixelIconLink
-                  href="https://www.linkedin.com/in/atcharaporn-okrathok-40a2a0189/"
-                  icon={FaLinkedin}
-                  label="LinkedIn"
-                  color="bg-[var(--sky)]"
-                />
-              </div>
+      <main id="main">
+        {/* Introduction */}
+        <section id="home" className="hero container">
+          <div className="hero-copy">
+            <div className="eyebrow"><span className="status-dot" /> JUNIOR FULL STACK DEVELOPER</div>
+            <h1>Hi, I’m Faii.<br />A developer with<br /><span className="serif-accent">a curious mind.</span></h1>
+            <p className="hero-description">I build web applications with React and Node.js. I enjoy turning designs into working interfaces, figuring out the backend, and learning alongside a team.</p>
+            <div className="hero-actions">
+              <a href="#projects" className="button button-primary">View my work <ArrowUpRight size={18} /></a>
+              <a href={CV_URL} download="Atcharaporn-Okrathok-CV.pdf" className="button button-outline">Download CV <Download size={17} /></a>
             </div>
+            <div className="hero-socials">
+              <ExternalLink href={GITHUB} className="social-text"><Github size={16} /> GitHub</ExternalLink>
+              <ExternalLink href={LINKEDIN} className="social-text"><Linkedin size={16} /> LinkedIn</ExternalLink>
+              <ExternalLink href={CV_URL} className="cv-preview"><Eye size={16} /> Preview CV</ExternalLink>
+            </div>
+          </div>
+          <div className="hero-art">
+            <span className="art-spark" aria-hidden="true">✳</span>
+            <div className="portrait-frame">
+              <div className="portrait-topline"><span>A LITTLE BIT OF ME</span><span>01 / FAII</span></div>
+              <img src={avatar} alt="Pixel art illustration of Faii coding at her desk" width="1024" height="1024" fetchPriority="high" />
+              <div className="portrait-caption"><div><strong>Atcharaporn Okrathok</strong><span>Code, coffee, and a little curiosity.</span></div><Code2 size={25} /></div>
+            </div>
+            <div className="floating-note"><span className="note-pin" aria-hidden="true" />Always learning.<br /><strong>Always building.</strong></div>
+            <span className="art-coordinate">A PIXEL-SIZED GLIMPSE INTO MY WORLD</span>
+          </div>
+          <a className="scroll-cue" href="#about"><span className="scroll-circle"><ArrowDown size={16} /></span> Get to know me</a>
+          <span className="hero-index" aria-hidden="true">PORTFOLIO — 2026</span>
+        </section>
 
-            <div className="mx-auto w-full max-w-lg">
-              <div className="relative">
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 translate-x-4 translate-y-4 border-4 border-black bg-[var(--yellow)]"
-                />
-
-                <figure className="relative border-4 border-black bg-[var(--purple)] p-3">
-                  <div className="flex items-center justify-between gap-3 border-4 border-b-0 border-black bg-[var(--blue)] px-3 py-2">
-                    <div className="flex shrink-0 gap-2">
-                      <span className="h-4 w-4 border-2 border-black bg-[var(--coral)]" />
-                      <span className="h-4 w-4 border-2 border-black bg-[var(--yellow)]" />
-                      <span className="h-4 w-4 border-2 border-black bg-[var(--green)]" />
-                    </div>
-
-                    <span className="truncate text-[6px] leading-4 sm:text-[7px]">
-                      PLAYER_01.PNG
-                    </span>
-                  </div>
-
-                  <div className="relative overflow-hidden border-4 border-black bg-[var(--navy)]">
-                    <img
-                      src={avatar}
-                      alt="Pixel art portrait of Atcharaporn working at a computer"
-                      className="pixel-avatar aspect-square w-full object-cover"
-                      width="1024"
-                      height="1024"
-                    />
-
-                    <div className="absolute bottom-3 left-3 right-3 border-4 border-black bg-[var(--navy)] p-3 text-white">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <span className="text-[7px] leading-5 sm:text-[8px]">
-                          ATCHARAPORN OKRATHOK
-                        </span>
-
-                        <span className="inline-flex items-center gap-2 text-[7px] leading-5 text-[var(--status)] sm:text-[8px]">
-                          <span className="animate-blink h-3 w-3 bg-[var(--status)]" />
-                          ONLINE
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </figure>
-              </div>
-
-              <div className="pixel-box mx-auto mt-10 w-fit bg-[var(--green)] px-5 py-3">
-                <p className="animate-bounce-short text-center text-[8px] leading-5 sm:text-[9px]">
-                  READY TO CREATE!
-                </p>
-              </div>
+        {/* Background */}
+        <section id="about" className="section about-section">
+          <div className="container about-layout">
+            <div><SectionLabel number="01">ABOUT ME</SectionLabel><h2>A little about<br /><span className="serif-accent">the person behind it.</span></h2></div>
+            <div className="about-copy">
+              <p>I’m Atcharaporn, but you can call me <strong>Faii</strong>. I graduated from the <strong>Generation Thailand Junior Software Developer Bootcamp</strong>, where I built full-stack applications and learned to work in an Agile team.</p>
+              <p>I enjoy both sides of development: translating Figma designs into responsive interfaces and connecting them to APIs and databases. Working on a team project taught me as much about communication and code reviews as it did about writing code.</p>
+              <a className="text-link" href="#projects">See what I’ve been working on <ArrowDown size={16} /></a>
             </div>
           </div>
         </section>
 
-        <section
-          id="about"
-          className="animated-section scroll-mt-24 border-b-4 border-black bg-[var(--aqua)] px-5 py-24 lg:px-8"
-        >
-          <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
-            <div>
-              <SectionTitle
-                number="01"
-                title="ABOUT ME"
-                color="bg-[var(--yellow)]"
-              />
-
-              <h2 className="mt-9 text-xl leading-[2] sm:text-2xl sm:leading-[2] lg:text-3xl">
-                TURNING IDEAS
-                <span className="block text-[var(--hot-pink)]">
-                  INTO REALITY
-                </span>
-              </h2>
+        {/* Selected work comes before the skills list for quick recruiter review. */}
+        <section id="projects" className="section container">
+          <SectionLabel number="02">SELECTED WORK</SectionLabel>
+          <div className="section-heading"><h2>From learning<br /><span className="serif-accent">to building.</span></h2><ExternalLink href={GITHUB} className="text-link">More on GitHub <ArrowUpRight size={18} /></ExternalLink></div>
+          <article className="project-card">
+            <div className="project-art" aria-label="Gearverse project typographic cover">
+              <div className="project-art-top"><span>BOOTCAMP TEAM PROJECT</span><ArrowUpRight size={20} /></div>
+              <div className="gearverse-mark"><span className="gearverse-symbol" aria-hidden="true">gv<span>↗</span></span><strong>GEARVERSE</strong><p>GAMING GEAR ONLINE STORE</p></div>
+              <div className="project-art-bottom"><span>FULL-STACK WEB APPLICATION</span><span>01</span></div>
             </div>
+            <div className="project-content"><div className="eyebrow">E-COMMERCE <span className="tiny-divider" /> TEAM PROJECT</div><h3>Gearverse</h3><p>A gaming gear online store built with a team using Scrum — from the first Figma wireframes to a working web application.</p><h4>What I worked on</h4><ul className="project-highlights"><li>Turning Figma designs into responsive UI components</li><li>Implementing login and registration authentication</li><li>Managing Git branches and collaborating on GitHub</li></ul><div className="tags"><span>React</span><span>Node.js</span><span>Express</span><span>Tailwind CSS</span><span>MongoDB</span></div><ExternalLink href="https://github.com/nookarin/team-07-ProjectGV-Sprint2" className="text-link project-link">View code on GitHub <ArrowUpRight size={18} /></ExternalLink></div>
+          </article>
+        </section>
 
-            <div className="pixel-box bg-[var(--surface)] p-6 sm:p-8">
-              <div className="space-y-6 text-[10px] leading-7 sm:text-xs sm:leading-8">
-                <p>
-                  I am passionate about both frontend and backend development,
-                  with a strong interest in creating clear, intuitive, and
-                  user-friendly digital experiences.
-                </p>
-
-                <div className="h-1 bg-black" />
-
-                <p>
-                  I enjoy learning new technologies, collaborating with teams,
-                  and improving my skills by building practical, real-world
-                  projects.
-                </p>
-              </div>
+        {/* Skills */}
+        <section id="skills" className="section skills-section">
+          <div className="container">
+            <SectionLabel number="03">SKILLS & WORKFLOW</SectionLabel>
+            <div className="section-heading"><h2>What I<br /><span className="serif-accent">work with.</span></h2><p>The technologies I use to build,<br />test, and collaborate.</p></div>
+            <div className="skills-grid">
+              {skillGroups.map(({ title, icon: Icon, skills }, index) => <article className="skill-card" key={title}>
+                <div className="skill-card-top"><div className="skill-icon"><Icon size={23} strokeWidth={1.6} /></div><span>0{index + 1}</span></div>
+                <h3>{title}</h3><div className="tags">{skills.map((skill) => <span key={skill}>{skill}</span>)}</div>
+              </article>)}
             </div>
+            <div className="team-note"><GitBranch size={23} /><div><strong>Experience working as a team</strong><p>Daily standups, sprint planning, retrospectives, pull requests, code reviews, and resolving merge conflicts.</p></div><span className="team-tag">AGILE / SCRUM</span></div>
           </div>
         </section>
 
-        <section
-          id="skills"
-          className="animated-section pixel-dot-pattern scroll-mt-24 border-b-4 border-black bg-[var(--soft-yellow)] px-5 py-24 lg:px-8"
-        >
-          <div className="relative mx-auto max-w-7xl">
-            <SectionTitle
-              number="02"
-              title="MY SKILLS"
-              color="bg-[var(--purple)]"
-            />
-
-            <p className="mt-8 max-w-3xl text-[10px] leading-7 sm:text-xs sm:leading-8">
-              Technologies and tools I use to design, develop, test, and
-              collaborate effectively with a team.
-            </p>
-
-            <div className="mt-12 grid gap-8 md:grid-cols-2">
-              {skillGroups.map((group) => {
-                const Icon = group.icon;
-
-                return (
-                  <article
-                    key={group.title}
-                    className="pixel-box bg-[var(--surface)] p-6 transition-transform duration-100 hover:-translate-y-2"
-                  >
-                    <div className="flex items-center gap-5">
-                      <div
-                        className={`grid h-14 w-14 shrink-0 place-items-center border-4 border-black ${group.color}`}
-                      >
-                        <Icon
-                          size={27}
-                          strokeWidth={3}
-                          aria-hidden="true"
-                        />
-                      </div>
-
-                      <h3 className="text-xs leading-6 sm:text-sm">
-                        {group.title}
-                      </h3>
-                    </div>
-
-                    <div className="mt-7 flex flex-wrap gap-3">
-                      {group.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center gap-2 border-2 border-black bg-[var(--tag)] px-3 py-2 text-[7px] leading-5 shadow-[3px_3px_0_#000] sm:text-[8px]"
-                        >
-                          <SkillIcon skill={skill} />
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="projects"
-          className="animated-section scroll-mt-24 border-b-4 border-black bg-[var(--purple)] px-5 py-24 lg:px-8"
-        >
-          <div className="relative mx-auto max-w-7xl">
-            <SectionTitle
-              number="03"
-              title="PROJECTS"
-              color="bg-[var(--green)]"
-            />
-
-            <div className="mt-12 space-y-10">
-              {projects.map((project, index) => (
-                <article
-                  key={project.title}
-                  className="pixel-box overflow-hidden bg-[var(--surface)]"
-                >
-                  <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
-                    <div className="pixel-project-bg flex min-h-72 items-center justify-center border-b-4 border-black p-10 lg:border-b-0 lg:border-r-4">
-                      <div className="text-center">
-                        <Code2
-                          size={100}
-                          strokeWidth={2.5}
-                          aria-hidden="true"
-                        />
-
-                        <div className="mt-6 border-4 border-black bg-[var(--yellow)] px-4 py-3 text-[8px] leading-5 shadow-[5px_5px_0_#000]">
-                          LEVEL {String(index + 1).padStart(2, "0")}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-7 sm:p-10">
-                      <p className="text-[7px] leading-6 text-[var(--purple-text)] sm:text-[8px]">
-                        {project.type}
-                      </p>
-
-                      <h3 className="mt-5 text-xl leading-[1.8] sm:text-2xl">
-                        {project.title}
-                      </h3>
-
-                      <p className="mt-5 text-[10px] leading-7 sm:text-xs sm:leading-8">
-                        {project.description}
-                      </p>
-
-                      <div className="mt-7 flex flex-wrap gap-3">
-                        {project.technologies.map((technology) => (
-                          <span
-                            key={technology}
-                            className="border-2 border-black bg-[var(--aqua)] px-3 py-2 text-[7px] leading-5 shadow-[3px_3px_0_#000] sm:text-[8px]"
-                          >
-                            {technology}
-                          </span>
-                        ))}
-                      </div>
-
-                      <a
-                        href={project.repository}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="pixel-button mt-9 inline-flex items-center gap-3 bg-[var(--yellow)] px-5 py-4 text-[8px] leading-5"
-                      >
-                        <FaGithub
-                          className="h-5 w-5 shrink-0"
-                          aria-hidden="true"
-                        />
-                        VIEW REPOSITORY
-                        <ExternalLink
-                          size={16}
-                          strokeWidth={4}
-                          className="shrink-0"
-                          aria-hidden="true"
-                        />
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="contact"
-          className="animated-section pixel-grid scroll-mt-24 bg-[var(--green)] px-5 py-24 lg:px-8"
-        >
-          <div className="relative mx-auto max-w-7xl">
-            <div className="pixel-box bg-[var(--tag)] p-7 sm:p-10 lg:p-12">
-              <div className="grid gap-12 lg:grid-cols-2">
-                <div>
-                  <SectionTitle
-                    number="04"
-                    title="CONTACT"
-                    color="bg-[var(--coral)]"
-                  />
-
-                  <h2 className="mt-9 text-xl leading-[2] sm:text-2xl sm:leading-[2] lg:text-3xl">
-                    LET&apos;S WORK
-                    <span className="block text-[var(--link)]">
-                      TOGETHER!
-                    </span>
-                  </h2>
-
-                  <p className="mt-6 text-[10px] leading-7 sm:text-xs sm:leading-8">
-                    Have a project in mind, an opportunity to discuss, or just
-                    want to say hello? Feel free to contact me through any of
-                    the channels listed here.
-                  </p>
-                </div>
-
-                <div className="space-y-5">
-                  <ContactItem
-                    icon={Mail}
-                    label="EMAIL"
-                    value="*************@*****.***"
-                    href="mailto:*************@*****.***"
-                    color="bg-[var(--cyan)]"
-                  />
-
-                  <ContactItem
-                    icon={Phone}
-                    label="PHONE"
-                    value="*****************************"
-                    href="tel:***********************"
-                    color="bg-[var(--yellow)]"
-                  />
-
-                  <div className="flex flex-wrap gap-5 pt-4">
-                    <PixelSocialLink
-                      href="https://github.com/B6001186"
-                      icon={FaGithub}
-                      label="GITHUB"
-                      color="bg-[var(--surface)]"
-                    />
-
-                    <PixelSocialLink
-                      href="https://www.linkedin.com/in/atcharaporn-okrathok-40a2a0189/"
-                      icon={FaLinkedin}
-                      label="LINKEDIN"
-                      color="bg-[var(--sky)]"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Contact */}
+        <section id="contact" className="section container contact-section">
+          <SectionLabel number="04">CONTACT</SectionLabel>
+          <div className="contact-layout"><div><h2>Let’s talk<br /><span className="serif-accent">about what’s next.</span></h2><p>Have a junior developer opportunity or a project in mind?<br />I’d love to hear from you.</p><a href={`mailto:${EMAIL}`} className="button button-primary">Say hello <ArrowUpRight size={18} /></a></div>
+            <div className="contact-details"><div className="contact-row"><Mail size={21} /><div><span className="contact-label">EMAIL</span><a href={`mailto:${EMAIL}`}>{EMAIL}</a></div><button className="icon-button copy-button" onClick={copyEmail} aria-label="Copy email address">{copyState === "copied" ? <Check size={18} /> : <Copy size={18} />}</button></div><p className="copy-feedback" role="status">{copyState === "copied" ? "Email copied!" : copyState === "error" ? "Couldn’t copy. You can select the email above to copy it." : ""}</p><div className="contact-row"><Phone size={21} /><div><span className="contact-label">PHONE</span><a href="tel:+66821300459">082-130-0459</a></div><ArrowUpRight size={18} /></div><div className="contact-socials"><ExternalLink href={GITHUB} className="text-link"><Github size={18} /> GitHub <ArrowUpRight size={15} /></ExternalLink><ExternalLink href={LINKEDIN} className="text-link"><Linkedin size={18} /> LinkedIn <ArrowUpRight size={15} /></ExternalLink></div></div>
           </div>
         </section>
       </main>
-
-      <footer className="border-t-4 border-black bg-[var(--navy)] px-5 py-8 text-white lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 text-center sm:flex-row">
-          <p className="text-[7px] leading-5 sm:text-[8px]">
-            © 2026 ATCHARAPORN
-          </p>
-
-          <p className="animate-blink text-[7px] leading-5 text-[var(--status)] sm:text-[8px]">
-            GAME SAVED SUCCESSFULLY!
-          </p>
-
-          <div className="flex gap-4">
-            <FooterIcon
-              href="https://github.com/B6001186"
-              icon={FaGithub}
-              label="GitHub"
-            />
-
-            <FooterIcon
-              href="https://www.linkedin.com/in/atcharaporn-okrathok-40a2a0189/"
-              icon={FaLinkedin}
-              label="LinkedIn"
-            />
-          </div>
-        </div>
-      </footer>
+      <footer className="container footer"><a href="#home" className="wordmark" aria-label="Faii, back to top">faii<span>.</span></a><p>© {new Date().getFullYear()} Atcharaporn Okrathok</p><a href="#home" className="back-to-top">Back to top <ArrowUpRight size={16} /></a></footer>
     </div>
   );
 }
 
-function ThemeButton({ retroMode, onClick, desktop = false }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={
-        retroMode ? "Switch to colorful theme" : "Switch to retro theme"
-      }
-      aria-pressed={retroMode}
-      title={retroMode ? "Switch to colorful theme" : "Switch to retro theme"}
-      className={`pixel-button items-center justify-center gap-2 bg-[var(--yellow)] px-3 text-[7px] leading-5 sm:text-[8px] ${
-        desktop ? "hidden h-11 md:inline-flex" : "inline-flex py-4"
-      }`}
-    >
-      <Contrast size={19} strokeWidth={3.5} aria-hidden="true" />
-      <span>{retroMode ? "COLOR MODE" : "RETRO MODE"}</span>
-    </button>
-  );
+function SectionLabel({ number, children }) {
+  return <div className="section-label"><span>{number}</span>{children}</div>;
 }
 
-function SectionTitle({ number, title, color }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span
-        className={`grid h-12 w-12 shrink-0 place-items-center border-4 border-black text-[8px] shadow-[4px_4px_0_#000] sm:text-[9px] ${color}`}
-      >
-        {number}
-      </span>
-
-      <h2 className="text-base leading-7 sm:text-xl sm:leading-8">{title}</h2>
-    </div>
-  );
-}
-
-function PixelDecoration({ className }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={`absolute hidden h-7 w-7 border-4 border-black shadow-[5px_5px_0_#000] sm:block ${className}`}
-    />
-  );
-}
-
-function SkillIcon({ skill }) {
-  if (skill === "GitHub") {
-    return <FaGithub className="h-4 w-4 shrink-0" aria-hidden="true" />;
-  }
-
-  if (skill === "Figma") {
-    return <SiFigma className="h-4 w-4 shrink-0" aria-hidden="true" />;
-  }
-
-  return null;
-}
-
-function PixelIconLink({ href, icon: Icon, label, color }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={label}
-      title={label}
-      className={`pixel-button grid h-14 w-14 place-items-center ${color}`}
-    >
-      <Icon className="h-7 w-7" aria-hidden="true" />
-    </a>
-  );
-}
-
-function PixelSocialLink({ href, icon: Icon, label, color }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={label}
-      className={`pixel-button inline-flex items-center gap-3 px-4 py-4 text-[7px] leading-5 sm:text-[8px] ${color}`}
-    >
-      <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-      {label}
-      <ExternalLink
-        size={14}
-        strokeWidth={4}
-        className="shrink-0"
-        aria-hidden="true"
-      />
-    </a>
-  );
-}
-
-function ContactItem({ icon: Icon, label, value, href, color }) {
-  const content = (
-    <>
-      <div
-        className={`grid h-12 w-12 shrink-0 place-items-center border-4 border-black ${color}`}
-      >
-        <Icon size={22} strokeWidth={3} aria-hidden="true" />
-      </div>
-
-      <div className="min-w-0">
-        <p className="text-[7px] leading-5 sm:text-[8px]">{label}</p>
-
-        <p className="mt-2 break-all text-[8px] leading-6 sm:text-[9px]">
-          {value}
-        </p>
-      </div>
-    </>
-  );
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        className="flex items-center gap-4 border-4 border-black bg-[var(--surface)] p-4 shadow-[5px_5px_0_#000] transition-transform duration-100 hover:-translate-y-1"
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return (
-    <div className="flex items-center gap-4 border-4 border-black bg-[var(--surface)] p-4 shadow-[5px_5px_0_#000]">
-      {content}
-    </div>
-  );
-}
-
-function FooterIcon({ href, icon: Icon, label }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={label}
-      title={label}
-      className="grid h-10 w-10 place-items-center border-2 border-white bg-[var(--hot-pink)] text-xl text-white transition-colors duration-100 hover:bg-[var(--yellow)] hover:text-black"
-    >
-      <Icon aria-hidden="true" />
-    </a>
-  );
+function ExternalLink({ href, className, children }) {
+  return <a href={href} className={className} target="_blank" rel="noreferrer">{children}</a>;
 }
 
 export default App;
