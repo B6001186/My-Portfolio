@@ -3,7 +3,8 @@ import { ArrowDown, ArrowUpRight, Check, Code2, Copy, Database, Download, Eye, G
 import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
 import avatar from "./assets/avatar.png";
 
-const CV_URL = "/Atcharaporn-Okrathok-CV.pdf";
+const CV_FILENAME = "Atcharaporn_Okrathok_CV.pdf";
+const CV_URL = `${import.meta.env.BASE_URL}${CV_FILENAME}`;
 const EMAIL = "atcharapornok@gmail.com";
 const GITHUB = "https://github.com/B6001186";
 const LINKEDIN = "https://www.linkedin.com/in/atcharaporn-okrathok-40a2a0189/";
@@ -97,7 +98,7 @@ function App() {
             <p className="hero-description">I build web applications with React and Node.js. I enjoy turning designs into working interfaces, figuring out the backend, and learning alongside a team.</p>
             <div className="hero-actions">
               <a href="#projects" className="button button-primary">View my work <ArrowUpRight size={18} /></a>
-              <a href={CV_URL} download="Atcharaporn-Okrathok-CV.pdf" className="button button-outline">Download CV <Download size={17} /></a>
+              <a href={CV_URL} download={CV_FILENAME} className="button button-outline">Download CV <Download size={17} /></a>
             </div>
             <div className="hero-socials">
               <ExternalLink href={GITHUB} className="social-text"><Github size={16} /> GitHub</ExternalLink>
